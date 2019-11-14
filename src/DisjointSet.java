@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public class DisjointSet<E> {
+public class DisjointSet {
     //    ArrayList<E> array;
     Set[] nodes;
 
@@ -9,69 +9,92 @@ public class DisjointSet<E> {
         nodes = new Set[size];
     }
 
-    public void addToArray(E e, int index) {
-        this.nodes[index] = new Set(e);
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (Set s : this.nodes) {
+            sb.append(s.toString());
+        }
+        return sb.toString();
+    }
+
+    public void addToArray(int index) {
+        this.nodes[index] = new Set(index);
+    }
+
+    public void union(int a, int b) {
+        int aRoot = find(a);
+        int bRoot = find(b);
+        if (Math.abs(this.nodes[aRoot].element) >= Math.abs(this.nodes[bRoot].element)){
+            this.nodes[aRoot].element += this.nodes[bRoot].element;
+            this.nodes[bRoot].element = aRoot;
+            pathCompress(b, aRoot);
+        }
+        else{
+            this.nodes[bRoot].element += this.nodes[aRoot].element;
+            this.nodes[aRoot].element = bRoot;
+            pathCompress(a, bRoot);
+        }
+    }
+    public void pathCompress(int x, int root){
+        if (this.nodes[x].element >= 0){
+            pathCompress(this.nodes[x].element, root);
+            this.nodes[x].element = root;
+        }
     }
 
 
-    private class Set<E> {
-        //        private SetNode root;
-        private int parent;
-        private E element;
-        private ArrayList<Set> children;
 
-        private Set(E e) {
-            this.parent = -1;
-            this.element = e;
-            this.children = new ArrayList<>(0);
+
+    public int find(int index) {
+        if (this.nodes[index].element >= 0) {
+//            this.nodes[index].element = find(this.nodes[index].element);
+            return find(this.nodes[index].element);
+        } else if (this.nodes[index].element == 0) {
+            System.out.println("element = 0, no good");
         }
+        return index;
 
-        public String toString(Set node, String toReturn, String recLevel) {
-            recLevel = recLevel + " ";
-            toReturn = toReturn + recLevel + node.nodeToString() + recLevel + "\n";
-            for (int i = 0; i < node.children.size(); i++) {
-                toReturn = toReturn + toString((Set) this.children.get(i), toReturn, recLevel);
-            }
-            return toReturn;
+    }
+
+
+    private class Set {
+        //        private SetNode root;
+        private int index;
+        private int element;
+
+        private Set(int index) {
+            this.element = -1;
+            this.index = index;
         }
 
         public String toString() {
-            return toString(this, "", "");
+            return index + " : " + element + "\n";
+//            else return element + " | " + setSize * -1;
         }
-
-        public String nodeToString() {
-            return "Element: " + element.toString() + " Parent: " + parent;
-        }
-
-
     }
 
-//    private class SetNode{
-//        private int parent;
-//        private E element;
-//        private ArrayList<SetNode> children;
-//        private SetNode(E e){
-//            this.element = e;
-//            this.parent = -1;
-//            SetNode something = children.get(0);
-//        }
-//        public String toString(){
-//            return "Element: " + element.toString() + "Parent: " + parent;
-//        }
-
-
-//    }
 
     public static void main(String[] args) {
-        int size = 10;
-        DisjointSet<Integer> ds = new DisjointSet<>(size);
+        int size = 11;
+        DisjointSet ds = new DisjointSet(size);
         for (int i = 0; i < size; i++) {
-            ds.addToArray(i, i);
+            ds.addToArray(i);
         }
-        System.out.println(ds.nodes.length);
-        for (int i = 0; i < size; i++) {
-            System.out.println(ds.nodes[i].toString());
-        }
+        ds.union(0, 1);
+        ds.union(5, 6);
+        ds.union(4, 6);
+        ds.union(7, 4);
+        ds.union(1, 6);
+        ds.union(2, 3);
+        ds.union(9, 2);
+        ds.union(9, 10);
+        ds.union(1,9);
+
+
+        System.out.println(ds.toString());
+//        for (Set s : ds.nodes){
+//            System.out.println(s.setSize);
+//        }
 
     }
 
